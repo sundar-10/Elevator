@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body onload="getData()">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+	<div id = "div" >
+		
+	<select id="source"></select>
+	<select id = "destination"></select>
+	
+	</div>
+	<div class = "timer">
+		<div style="border: 1px solid black" id="time">
+
+			
+		</div>
+		<button class="pause">Get Request</button> <span class="time">1</span>	
+	</div>
+</body>
+</html>
+<script type="text/javascript">
+	function getData(){
+		console.log("func call")
+		var data = {"flag" : 0}
+		$.ajax({ 
+        url: '/', 
+        type: 'POST',
+        data: JSON.stringify(data,null , '') ,
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response){ 
+        	console.log(response);
+        	var $select = $("#source");
+        	var $select1 = $("#destination");
+        	console.log($select)
+        	response=response.substr(1,response.length-2)
+        	response = response.split(",");
+        	console.log(response[1])
+		    for (i=0;i<response[0];i++){
+		        $select.append($('<option></option>').val(i).html(i))
+		    }
+		    for (i=0;i<response[1];i++){
+		        $select1.append($('<option></option>').val(i).html(i))
+		    }
+        }
+    });
+	}
+	var count = 0,
+    $time = $('.time'),
+    timer,
+    paused = false,
+    counter = function(){
+        count++;
+        var data = {"flag" : 2}
+        $.ajax({ 
+
+        url: '/', 
+        type: 'POST',
+        data: JSON.stringify(data,null , '') ,
+        contentType: 'application/json;charset=UTF-8',
+        success: function(response){ 
+        }});
+        //if (count > ) { count = 1; }
+        $time.html(count);
+        timer = setTimeout(function(){
+            counter();
+        }, 5000);
+    };
+	counter();
+	$('button').on('click', function(){
+	    clearTimeout(timer);
+	    if ($(this).hasClass('restart')) {
+	        count = 0;
+	        paused = false;
+	        counter();
+	    } else {
+	    	var source = $("#source").val()
+			var destination = $("#destination").val()
+			var data = {"flag" : 1, "source" : source, "destination" : destination}
+	        $.ajax({ 
+        url: '/', 
+        type: 'POST', 
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(data,null , '') ,
+        success: function(response){ 
+        }});
+	        paused = !paused;
+	        if (!paused) {
+	            counter();
+	        }
+	    }
+	});
+	function putdata(){
+		//timer.pause();
+		
+		console.log(source, destination );
+		//timer.play();
+	}
+</script>
